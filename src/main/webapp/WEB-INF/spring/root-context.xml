@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- JMS -->
+	<bean id="connectionFactory"
+		class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://127.0.0.1:61616"></property>	
+	</bean>
+	<bean id="ipTopicDestination"  class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="ipTopic"/>
+    </bean>
+    <bean id="keyTopicDestination"  class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="keyTopic"/>
+    </bean>
+    <bean id="ipJmsMessageListener" class="com.gcexe.monitor.taskclient.JMSMessageListener"/>
+    <bean id="keyJmsMessageListener" class="com.gcexe.monitor.taskclient.JMSMessageListener2"/>
+    <bean id="ipsJmsMessageListener" class="com.gcexe.monitor.taskclient.JMSMessageListener3"/>
+	<!--  -->
+	<bean id="ipsJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="destination" ref="ipTopicDestination"/>
+		<property name="pubSubDomain" value="true"/>
+		
+		<property name="concurrency" value="10"/>
+		<property name="subscriptionDurable" value="true"/>
+		<property name="messageListener" ref="ipsJmsMessageListener"/>
+		<property name="sessionAcknowledgeMode" value="1"/>
+		<property name="clientId" value="consumerClient3"/>
+	</bean>
+	<bean id="ipJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="destination" ref="ipTopicDestination"/>
+		<property name="pubSubDomain" value="true"/>
+		
+		<property name="concurrency" value="10"/>
+		<property name="subscriptionDurable" value="true"/>
+		<property name="messageListener" ref="ipJmsMessageListener"/>
+		<property name="sessionAcknowledgeMode" value="1"/>
+		<property name="clientId" value="consumerClient2"/>
+	</bean>
+	
+	<bean id="keyJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="destination" ref="keyTopicDestination"/>
+		<property name="pubSubDomain" value="true"/>
+		
+		<property name="concurrency" value="10"/>
+		<property name="subscriptionDurable" value="true"/>
+		<property name="messageListener" ref="keyJmsMessageListener"/>
+		<property name="sessionAcknowledgeMode" value="1"/>
+		<property name="clientId" value="consumerClient1"/>
+	</bean>
+		
+</beans>
